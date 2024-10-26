@@ -1,0 +1,219 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: gz_raw_data
+    description: original dataset in a raw format
+    tables:
+      - name: product
+        identifier: raw_gz_product
+        description: table contain all products and their information
+        columns:
+          - name: products_id
+            description: id of the product, must be unique and not null
+            tests:
+              - unique
+              - not_null
+          - name: purchSE_PRICE
+            description: price the product was purchased, should not be null
+            tests:
+              - not_null
+
+      - name: sales
+        identifier: raw_gz_sales
+        description: table contain all sales and their information
+        columns:
+          - name: date_date
+            description: date of creation of the order
+          - name: order_id
+            description: id of the order
+          - name: pdt_id
+            description: id of the product
+          - name: revenue
+            description: revenue by product
+          - name: quantity
+            description: quantity of the product in the order
+        tests:
+          - unique:
+              # description: concat order_id and pdt_id to form a PK
+              column_name: "(orders_id || '-' || pdt_id)"
+        freshness:
+          warn_after:
+            count: 1
+            period: day
+          error_after:
+            count: 854
+            period: day
+        loaded_at_field: "CAST(date_date AS TIMESTAMP)"
+
+      - name: ship
+        identifier: raw_gz_ship
+        description: table contains all shipments and their information
+        columns:
+          - name: orders_id
+            description: id of the order, should be pk, that means - unique
+            tests:
+              - not_null
+              - unique
+          - name: shipping_fee
+            description: what columns is this one?
+          - name: shipping_fee_1
+            description: what columns is this one?
+          - name: logCost
+            description: logistic costs
+          - name: ship_cost
+            description: cost og the shippment
+      - name: adwords
+        identifier: raw_gz_adwords
+        description: table contains all campaign and costs with dates
+        columns:
+          - name: date_date
+            description: date of the campaign
+            tests:
+              - not_null
+          - name: paid_source
+            description: to be defined
+            tests:
+              - not_null
+          - name: campaign_key
+            description: to be defined
+            tests:
+              - not_null
+          - name: camPGN_name
+            description: to be defined
+            tests:
+              - not_null
+          - name: ads_cost
+            description: to be defined
+            tests:
+              - not_null
+          - name: impression
+            description: to be defined
+            tests:
+              - not_null
+          - name: click
+            description: to be defined
+            tests:
+              - not_null
+
+      - name: bing
+        identifier: raw_gz_bing
+        description: table contains all campaign and costs with dates for bing media
+        columns:
+          - name: date_date
+            description: date of the campaign
+            tests:
+              - not_null
+          - name: paid_source
+            description: to be defined
+            tests:
+              - not_null
+          - name: campaign_key
+            description: to be defined
+            tests:
+              - not_null
+          - name: camPGN_name
+            description: to be defined
+            tests:
+              - not_null
+          - name: ads_cost
+            description: to be defined
+            tests:
+              - not_null
+          - name: impression
+            description: to be defined
+            tests:
+              - not_null
+          - name: click
+            description: to be defined
+            tests:
+              - not_null
+
+      - name: criteo
+        identifier: raw_gz_criteo
+        description: table contains all campaign and costs with dates for criteo media
+        columns:
+          - name: date_date
+            description: date of the campaign
+            tests:
+              - not_null
+          - name: paid_source
+            description: to be defined
+            tests:
+              - not_null
+          - name: campaign_key
+            description: to be defined
+            tests:
+              - not_null
+          - name: camPGN_name
+            description: to be defined
+            tests:
+              - not_null
+          - name: ads_cost
+            description: to be defined
+            tests:
+              - not_null
+          - name: impression
+            description: to be defined
+            tests:
+              - not_null
+          - name: click
+            description: to be defined
+            tests:
+              - not_null
+
+      - name: facebook
+        identifier: raw_gz_facebook
+        description: table contains all campaign and costs with dates for facebook media
+        tests:
+          - not_null:
+              column_name:
+                - date_date
+                - paid_source
+        columns:
+          - name: date_date
+            description: date of the campaign
+
+          - name: paid_source
+            description: to be defined
+
+          - name: campaign_key
+            description: to be defined
+
+          - name: camPGN_name
+            description: to be defined
+
+          - name: ads_cost
+            description: to be defined
+
+          - name: impression
+            description: to be defined
+
+          - name: click
+            description: to be defined
+
+
+models:
+  - name: int_sales_margin
+    tests:
+      - unique:
+          column_name: "(orders_id || '-' || products_id)"
+    columns:
+      - name: orders_id
+        description: id of the order, should be pk, that means, unique and not null
+        tests:
+          - not_null
+      - name: products_id
+        description: id of the product, should not be null
+        tests:
+          - not_null
+      - name: margin
+        description: revenue - quantity*price
+        tests:
+          - not_null
+      - name: quantity
+        description: quantity purchased
+  - name: stg_raw__ship
+    columns:
+      - name: orders_id
+      - name: shipping_fee
