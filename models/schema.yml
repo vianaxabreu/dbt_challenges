@@ -37,6 +37,12 @@ sources:
           - unique:
               # description: concat order_id and pdt_id to form a PK
               column_name: "(orders_id || '-' || pdt_id)"
+
+          - dbt_utils.unique_combination_of_columns:
+              combination_of_columns:
+                - orders_id
+                - pdt_id
+
         freshness:
           warn_after:
             count: 1
