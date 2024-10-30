@@ -165,6 +165,11 @@ sources:
       - name: facebook
         identifier: raw_gz_facebook
         description: table contains all campaign and costs with dates for facebook media
+        tests:
+          - not_null:
+              column_name:
+                - date_date
+                - paid_source
         columns:
           - name: date_date
             description: date of the campaign
@@ -186,3 +191,29 @@ sources:
 
           - name: click
             description: to be defined
+
+
+models:
+  - name: int_sales_margin
+    tests:
+      - unique:
+          column_name: "(orders_id || '-' || products_id)"
+    columns:
+      - name: orders_id
+        description: id of the order, should be pk, that means, unique and not null
+        tests:
+          - not_null
+      - name: products_id
+        description: id of the product, should not be null
+        tests:
+          - not_null
+      - name: margin
+        description: revenue - quantity*price
+        tests:
+          - not_null
+      - name: quantity
+        description: quantity purchased
+  - name: stg_raw__ship
+    columns:
+      - name: orders_id
+      - name: shipping_fee
